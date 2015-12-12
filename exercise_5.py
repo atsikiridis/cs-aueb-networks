@@ -1,5 +1,6 @@
 import random
-from pprint import pprint
+import openpyxl
+
 
 def produce_sample_rtts():
 
@@ -33,7 +34,7 @@ def produce_sample_rtts():
 def compute_timeout_intervals(sample_rtts, a, b):
 
     estimated_rtts = [sample_rtts[0]]
-    dev_rtts =[0]
+    dev_rtts = [0]
     timeout_intervals = [estimated_rtts[0]]
 
     for sample_rtt in sample_rtts[1:]:
@@ -47,22 +48,31 @@ def compute_timeout_intervals(sample_rtts, a, b):
     return timeout_intervals
 
 
-def format_result_table(intervals, sample_rtts):
-    results = list()
+def write_result_table(intervals, sample_rtts, sheet=None):
+    if not sheet:
+        sheet = wb.create_sheet()
+    results = [["n", "TimeoutInterval(n-1)", "SampleRTT(n)", "retransmitting"]]
+    sheet.append(results[0])
     for i in range(100, 200):
         results.append([i + 1, intervals[i - 1], sample_rtts[i],
                         intervals[i-1] <= sample_rtts[i]])
+        sheet.append(results[-1])
 
-    return results
 
 if __name__ == "__main__":
 
+    wb = openpyxl.Workbook()
     rtts = produce_sample_rtts()
 
-    # TODO repeat for all values of a and b - 5 times in total
-    intervals = compute_timeout_intervals(rtts, 0.125, 0.125)
+    a_b_table = [[0.125, 0.125],
+                 [0.125, 0.25],
+                 [0.125, 0.375],
+                 [0.4, 0.25],
+                 [0.25, 0.25]]
 
-    results = format_result_table(intervals, rtts)
-    pprint(results)
+    ws = wb.active
 
-# TODO understand MSS
+    for a, b in a_b_table:
+        write_result_table(compute_timeout_intervals(rtts, a, b), rtts)
+
+    wb.save("results.xlsx")
