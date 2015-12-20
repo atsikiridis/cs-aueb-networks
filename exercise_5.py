@@ -33,7 +33,7 @@ def produce_sample_rtts():
 
 def compute_timeout_intervals(sample_rtts, a, b):
 
-    estimated_rtts = [sample_rtts[0]]
+    estimated_rtts = [40]
     dev_rtts = [0]
     timeout_intervals = [estimated_rtts[0]]
 
