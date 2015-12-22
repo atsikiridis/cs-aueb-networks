@@ -52,16 +52,12 @@ def f(improved=False):
                 else:
                     cong_win /= 2
                 last_time = i
-                print("boom")
+                #print("boom")
             else:
 
                 if timeout_intervals[i-1] <= sample_rtts[i]:
                     should_retransmit = True
-                    if improved and i - last_time > 5:
-                        cong_win -= 1
-                    else:
-                        cong_win /= 2
-                    print("timeout")
+                    cong_win /= 2
                 else:
                     should_retransmit = False
                     mss_sent += cong_win
